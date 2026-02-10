@@ -7,19 +7,27 @@
 # ]
 # ///
 """
-Generate images using Google's Nano Banana Pro (Gemini 3 Pro Image) API.
+Generate images using Gemini Image API with automatic model fallback.
 
 Usage:
     uv run generate_image.py --prompt "your image description" --filename "output.png" [--resolution 1K|2K|4K] [--api-key KEY]
 
 Multi-image editing (up to 14 images):
     uv run generate_image.py --prompt "combine these images" --filename "output.png" -i img1.png -i img2.png -i img3.png
+
+Fork of OpenClaw's nano-banana-pro with auto model fallback.
 """
 
 import argparse
 import os
 import sys
 from pathlib import Path
+
+# Fallback model chain (configurable via NANOBANANA_FALLBACK_MODELS env var, comma-separated)
+DEFAULT_FALLBACK_MODELS = [
+    "gemini-2.5-flash-image",
+    "gemini-2.0-flash-exp-image-generation",
+]
 
 
 def get_api_key(provided_key: str | None) -> str | None:
@@ -29,9 +37,17 @@ def get_api_key(provided_key: str | None) -> str | None:
     return os.environ.get("GEMINI_API_KEY")
 
 
+def get_fallback_models() -> list[str]:
+    """Get model fallback chain from env or defaults."""
+    env = os.getenv("NANOBANANA_FALLBACK_MODELS")
+    if env:
+        return [m.strip() for m in env.split(",") if m.strip()]
+    return DEFAULT_FALLBACK_MODELS.copy()
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate images using Nano Banana Pro (Gemini 3 Pro Image)"
+        description="Generate images using Gemini with auto model fallback"
     )
     parser.add_argument(
         "--prompt", "-p",
@@ -84,7 +100,7 @@ def main():
     output_path = Path(args.filename)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load input images if provided (up to 14 supported by Nano Banana Pro)
+    # Load input images if provided (up to 14 supported)
     input_images = []
     output_resolution = args.resolution
     if args.input_images:
@@ -125,58 +141,93 @@ def main():
         contents = args.prompt
         print(f"Generating image with resolution {output_resolution}...")
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3-pro-image-preview",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                response_modalities=["TEXT", "IMAGE"],
-                image_config=types.ImageConfig(
-                    image_size=output_resolution
+    # Try each model in fallback chain
+    fallback_models = get_fallback_models()
+    last_error = None
+    response = None
+
+    for model_name in fallback_models:
+        print(f"Trying model: {model_name}...")
+        try:
+            # Only gemini-3 models support image_size; others use aspectRatio only
+            is_gemini3 = "gemini-3" in model_name
+            if is_gemini3:
+                image_config = types.ImageConfig(image_size=output_resolution)
+            else:
+                image_config = types.ImageConfig()
+
+            response = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_modalities=["TEXT", "IMAGE"],
+                    image_config=image_config,
                 )
             )
-        )
 
-        # Process response and convert to PNG
-        image_saved = False
-        for part in response.parts:
-            if part.text is not None:
-                print(f"Model response: {part.text}")
-            elif part.inline_data is not None:
-                # Convert inline data to PIL Image and save as PNG
-                from io import BytesIO
+            # Check if response has image
+            has_image = False
+            if response.parts:
+                for part in response.parts:
+                    if part.inline_data is not None:
+                        has_image = True
+                        break
 
-                # inline_data.data is already bytes, not base64
-                image_data = part.inline_data.data
-                if isinstance(image_data, str):
-                    # If it's a string, it might be base64
-                    import base64
-                    image_data = base64.b64decode(image_data)
+            if has_image:
+                print(f"  ✓ Success with {model_name}")
+                break
+            else:
+                print(f"  {model_name}: no image in response, trying next...")
+                last_error = "No image in response"
+                response = None
+                continue
 
-                image = PILImage.open(BytesIO(image_data))
+        except Exception as e:
+            print(f"  {model_name} failed: {e}")
+            last_error = e
+            response = None
+            continue
 
-                # Ensure RGB mode for PNG (convert RGBA to RGB with white background if needed)
-                if image.mode == 'RGBA':
-                    rgb_image = PILImage.new('RGB', image.size, (255, 255, 255))
-                    rgb_image.paste(image, mask=image.split()[3])
-                    rgb_image.save(str(output_path), 'PNG')
-                elif image.mode == 'RGB':
-                    image.save(str(output_path), 'PNG')
-                else:
-                    image.convert('RGB').save(str(output_path), 'PNG')
-                image_saved = True
+    if response is None:
+        print(f"Error: All models failed. Last error: {last_error}", file=sys.stderr)
+        sys.exit(1)
 
-        if image_saved:
-            full_path = output_path.resolve()
-            print(f"\nImage saved: {full_path}")
-            # OpenClaw parses MEDIA tokens and will attach the file on supported providers.
-            print(f"MEDIA: {full_path}")
-        else:
-            print("Error: No image was generated in the response.", file=sys.stderr)
-            sys.exit(1)
+    # Process response and convert to PNG
+    image_saved = False
+    for part in response.parts:
+        if part.text is not None:
+            print(f"Model response: {part.text}")
+        elif part.inline_data is not None:
+            # Convert inline data to PIL Image and save as PNG
+            from io import BytesIO
 
-    except Exception as e:
-        print(f"Error generating image: {e}", file=sys.stderr)
+            # inline_data.data is already bytes, not base64
+            image_data = part.inline_data.data
+            if isinstance(image_data, str):
+                # If it's a string, it might be base64
+                import base64
+                image_data = base64.b64decode(image_data)
+
+            image = PILImage.open(BytesIO(image_data))
+
+            # Ensure RGB mode for PNG (convert RGBA to RGB with white background if needed)
+            if image.mode == 'RGBA':
+                rgb_image = PILImage.new('RGB', image.size, (255, 255, 255))
+                rgb_image.paste(image, mask=image.split()[3])
+                rgb_image.save(str(output_path), 'PNG')
+            elif image.mode == 'RGB':
+                image.save(str(output_path), 'PNG')
+            else:
+                image.convert('RGB').save(str(output_path), 'PNG')
+            image_saved = True
+
+    if image_saved:
+        full_path = output_path.resolve()
+        print(f"\nImage saved: {full_path}")
+        # OpenClaw parses MEDIA tokens and will attach the file on supported providers.
+        print(f"MEDIA: {full_path}")
+    else:
+        print("Error: No image was generated in the response.", file=sys.stderr)
         sys.exit(1)
 
 

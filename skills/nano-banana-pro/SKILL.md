@@ -1,77 +1,71 @@
 ---
-name: nano-banana-pro
-version: "1.0.0"
-description: "Generate or edit images via Gemini 3 Pro Image (Nano Banana Pro). Supports text-to-image, image editing, and multi-image composition."
+name: nanobanana-pro-fallback
+description: "Nano Banana Pro with auto model fallback — generate/edit images via Gemini Image API. Run via: uv run {baseDir}/scripts/generate_image.py --prompt 'desc' --filename 'out.png' [--resolution 1K|2K|4K] [-i input.png]. Supports text-to-image + image-to-image (up to 14); 1K/2K/4K. Fallback chain: gemini-2.5-flash-image → gemini-2.0-flash-exp. MUST use uv run, not python3."
+version: 0.4.4
+license: MIT
+homepage: https://github.com/yazelin/nanobanana-pro
 author: yazelin
-tags:
-  - ai-image
-  - gemini
-  - image-generation
-  - image-editing
-entrypoint: scripts/generate_image.py
+compatibility:
+  platforms:
+    - openclaw
+    - ching-tech-os
+metadata:
+  openclaw:
+    emoji: "🍌"
+    requires:
+      bins: ["uv"]
+      env: ["GEMINI_API_KEY"]
+    primaryEnv: GEMINI_API_KEY
+    install:
+      - id: uv-brew
+        kind: brew
+        formula: uv
+        bins: ["uv"]
+        label: "Install uv (brew)"
+  ctos:
+    requires_app: ""
+    mcp_servers: ""
 ---
 
-# Nano Banana Pro (Gemini 3 Pro Image)
+# Nano Banana Pro with Fallback
 
-🍌 使用 Google Gemini 3 Pro Image API 生成或編輯圖片的 Skill。
+Use the bundled script to generate or edit images. Automatically falls back through multiple Gemini models if one fails.
 
-包含完整可執行的 Python 腳本，支援：
-- **文字生成圖片** — 描述即生成
-- **單圖編輯** — 上傳一張圖 + 編輯指令
-- **多圖合成** — 最多 14 張圖片合成（構圖、風格轉換等）
+⚠️ **IMPORTANT: MUST use `uv run` or the `generate` wrapper. Do NOT use `python3` directly — dependencies won't be available.**
 
-## 前置需求
-
-- Python >= 3.10
-- `uv`（推薦）或 `pip`
-- `GEMINI_API_KEY` 環境變數
-
-## 使用方式
-
-### 生成圖片
+Generate (option A: wrapper script)
 
 ```bash
-uv run {baseDir}/scripts/generate_image.py --prompt "一幅水彩畫：雪地森林裡的狐狸" --filename "fox.png" --resolution 1K
+{baseDir}/scripts/generate --prompt "your image description" --filename "output.png" --resolution 1K
 ```
 
-### 編輯圖片
+Generate (option B: uv run)
 
 ```bash
-uv run {baseDir}/scripts/generate_image.py --prompt "把背景換成星空" --filename "output.png" -i "/path/to/input.png" --resolution 2K
+uv run {baseDir}/scripts/generate_image.py --prompt "your image description" --filename "output.png" --resolution 1K
 ```
 
-### 多圖合成（最多 14 張）
+Edit (single image)
+
+```bash
+uv run {baseDir}/scripts/generate_image.py --prompt "edit instructions" --filename "output.png" -i "/path/in.png" --resolution 2K
+```
+
+Multi-image composition (up to 14 images)
 
 ```bash
 uv run {baseDir}/scripts/generate_image.py --prompt "combine these into one scene" --filename "output.png" -i img1.png -i img2.png -i img3.png
 ```
 
-## API Key 設定
+API key
 
-三種方式（優先順序由高到低）：
+- `GEMINI_API_KEY` env var
+- Or set `skills."nanobanana-pro-fallback".apiKey` / `skills."nanobanana-pro-fallback".env.GEMINI_API_KEY` in `~/.openclaw/openclaw.json`
 
-1. 命令列參數：`--api-key YOUR_KEY`
-2. 環境變數：`export GEMINI_API_KEY="YOUR_KEY"`
-3. OpenClaw config：`skills."nano-banana-pro".apiKey`
+Notes
 
-## 參數說明
-
-| 參數 | 說明 |
-|------|------|
-| `--prompt, -p` | 圖片描述或編輯指令（必填） |
-| `--filename, -f` | 輸出檔名（必填） |
-| `--resolution, -r` | 解析度：1K（預設）、2K、4K |
-| `--input-image, -i` | 輸入圖片路徑（可多次指定，最多 14 張） |
-| `--api-key, -k` | Gemini API Key |
-
-## 注意事項
-
-- 解析度建議用 1K 即可（速度快、品質夠）
-- 檔名建議加時間戳：`yyyy-mm-dd-hh-mm-ss-name.png`
-- 腳本會輸出 `MEDIA:` 行，OpenClaw 會自動在聊天中附加圖片
-- 編輯模式會自動偵測輸入圖片尺寸來調整輸出解析度
-- 不要讀回生成的圖片內容，只回報檔案路徑
-
-## 實際程式碼
-
-`scripts/generate_image.py` — 176 行完整可執行的 Python 腳本，使用 `google-genai` SDK 直接呼叫 Gemini API。不是 wrapper、不是範例、是真的能跑的程式。
+- Resolutions: `1K` (default), `2K`, `4K`.
+- Models tried in order: `gemini-2.5-flash-image` → `gemini-2.0-flash-exp-image-generation` (configurable via `NANOBANANA_FALLBACK_MODELS` env var).
+- Use timestamps in filenames: `yyyy-mm-dd-hh-mm-ss-name.png`.
+- The script prints a `MEDIA:` line for OpenClaw to auto-attach on supported chat providers.
+- Do not read the image back; report the saved path only.

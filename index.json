@@ -21,8 +21,8 @@
     {
       "slug": "nano-banana-pro",
       "name": "Nano Banana Pro",
-      "version": "1.0.0",
-      "description": "Generate or edit images via Gemini 3 Pro Image. Supports text-to-image, image editing, and multi-image composition.",
+      "version": "0.4.4",
+      "description": "Nano Banana Pro with auto model fallback \u2014 generate/edit images via Gemini Image API. Supports text-to-image + image-to-image (up to 14); 1K/2K/4K. Fallback chain: gemini-2.5-flash-image \u2192 gemini-2.0-flash-exp.",
       "author": "yazelin",
       "tags": [
         "ai-image",
