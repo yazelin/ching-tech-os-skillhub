@@ -53,38 +53,6 @@
           "enabled": true
         }
       }
-    },
-    {
-      "slug": "md2doc",
-      "name": "md2doc",
-      "version": "1.0.0",
-      "description": "Markdown to Word converter skill (md2doc-evolution).",
-      "author": "yazelin",
-      "tags": [
-        "markdown",
-        "docx",
-        "converter"
-      ],
-      "download_url": "",
-      "sha256": "",
-      "source": "skillhub",
-      "ctos": {}
-    },
-    {
-      "slug": "md2ppt",
-      "name": "md2ppt",
-      "version": "1.0.0",
-      "description": "Markdown to PowerPoint converter skill (md2ppt-evolution).",
-      "author": "yazelin",
-      "tags": [
-        "markdown",
-        "pptx",
-        "converter"
-      ],
-      "download_url": "",
-      "sha256": "",
-      "source": "skillhub",
-      "ctos": {}
     }
   ]
 }
