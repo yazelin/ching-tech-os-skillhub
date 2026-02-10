@@ -64,6 +64,18 @@
       "sha256": "e6bcf77b4a33d96397bd221395a17295f3a6ad4377ef97d64aba01a26fe6c70b",
       "source": "skillhub",
       "ctos": {}
+    },
+    {
+      "slug": "erpnext-mcp",
+      "name": "ERPNext MCP",
+      "version": "0.1.0",
+      "description": "ERPNext MCP server - expose ERPNext REST API as an MCP toolset (CRUD, reports, workflows, files, inventory).",
+      "author": "yazelin",
+      "tags": ["erpnext", "mcp", "erp"],
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/erpnext-mcp.zip",
+      "sha256": "5e89616c723a26701a34204dbdf81f9c22b8acc7f81b020f647eae6d45b6f496",
+      "source": "skillhub",
+      "ctos": {"erp_integration": {"enabled": true, "systems": ["erpnext"]}}
     }
   ]
 }
