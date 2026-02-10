@@ -40,5 +40,5 @@ class Skill(BaseModel):
     files: list[str] = Field(default_factory=list)
     license: str = "MIT"
     checksum: str = ""
-    dependencies: list[Dependency] = Field(default_factory=list)
-    ctos: Optional[CTOSMeta] = None
+    dependencies: list[dict] = Field(default_factory=list)
+    ctos: Optional[dict] = None

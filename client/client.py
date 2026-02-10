@@ -74,6 +74,28 @@ class SkillHubClient:
             if child.is_dir() and skill_md.exists():
                 meta = _parse_frontmatter(skill_md)
                 if meta:
+                    # Normalize frontmatter fields that may be emitted as simple strings
+                    if 'dependencies' in meta and isinstance(meta['dependencies'], str):
+                        s = meta['dependencies'].strip()
+                        if s in ('[]', ''):
+                            meta['dependencies'] = []
+                        else:
+                            try:
+                                meta['dependencies'] = json.loads(s)
+                            except Exception:
+                                meta['dependencies'] = []
+                    if 'ctos' in meta and isinstance(meta['ctos'], str):
+                        s = meta['ctos'].strip()
+                        if s in ('{}', ''):
+                            meta['ctos'] = {}
+                        else:
+                            try:
+                                meta['ctos'] = json.loads(s)
+                            except Exception:
+                                meta['ctos'] = {}
+                    # handle naive block-parsing that produced a list for nested mappings
+                    if 'ctos' in meta and isinstance(meta['ctos'], list):
+                        meta['ctos'] = {}
                     results.append(Skill(**meta))
         return results
 
