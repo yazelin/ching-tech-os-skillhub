@@ -30,8 +30,8 @@
         "image-generation",
         "image-editing"
       ],
-      "download_url": "",
-      "sha256": "",
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.1/nano-banana-pro-0.4.4.zip",
+      "sha256": "d6e4a83849a505b8a6f9b6ee52fd8ac6bccbfb29f319467de710653960e9a542",
       "source": "skillhub",
       "ctos": {}
     }
