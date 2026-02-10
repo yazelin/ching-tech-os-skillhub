@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "ching-tech-os-skillhub"
@@ -16,6 +16,9 @@ dependencies = [
     "jsonschema>=4.20.0",
     "pyyaml>=6.0",
 ]
+
+[tool.setuptools]
+packages = ["client"]
 
 [project.scripts]
 skillhub = "client.client:main"
