@@ -4,7 +4,13 @@
   "title": "SkillHub Skill Metadata",
   "description": "JSON Schema for CTOS skill metadata as defined in SKILL.md frontmatter.",
   "type": "object",
-  "required": ["name", "version", "description", "author", "entrypoint"],
+  "required": [
+    "name",
+    "version",
+    "description",
+    "author",
+    "entrypoint"
+  ],
   "properties": {
     "name": {
       "type": "string",
@@ -28,7 +34,9 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": [],
       "description": "Searchable tags for categorization."
     },
@@ -38,7 +46,9 @@
     },
     "files": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": [],
       "description": "List of files included in the skill package."
     },
@@ -55,10 +65,17 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "version"],
+        "required": [
+          "name",
+          "version"
+        ],
         "properties": {
-          "name": { "type": "string" },
-          "version": { "type": "string" }
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
         }
       },
       "default": [],
@@ -75,18 +92,23 @@
         },
         "compatible_with": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "List of CTOS versions this skill is tested against."
         },
         "upgrade_policy": {
           "type": "string",
-          "enum": ["auto", "manual", "notify"],
+          "enum": [
+            "auto",
+            "manual",
+            "notify"
+          ],
           "default": "notify",
           "description": "How the skill should be upgraded: auto, manual, or notify."
         }
-      },
-      "required": ["version"]
+      }
     }
   },
   "additionalProperties": false

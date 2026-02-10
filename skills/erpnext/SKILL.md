@@ -1,9 +1,13 @@
 ---
 name: erpnext
 version: 1.0.0
-ctos:
-  erp_integration:
-    enabled: true
+description: "ERPNext integration helper skill — guides and helper scripts for connecting to erpnext-mcp."
+author: yazelin
+tags:
+  - erpnext
+  - mcp
+  - integration
+entrypoint: scripts/check_install.sh
 ---
 
 # ERPNext Skill

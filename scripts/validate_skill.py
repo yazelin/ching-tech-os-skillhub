@@ -20,7 +20,8 @@ SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schemas" / "skill.schema
 
 
 def extract_frontmatter(skill_md: Path) -> dict:
-    """Parse simple YAML frontmatter from a SKILL.md file without external dependencies."""
+    """Parse YAML frontmatter from a SKILL.md file using PyYAML."""
+    import yaml
     text = skill_md.read_text(encoding="utf-8")
     if not text.startswith("---"):
         raise ValueError(f"{skill_md}: missing YAML frontmatter delimiter.")
@@ -28,33 +29,10 @@ def extract_frontmatter(skill_md: Path) -> dict:
     if len(parts) < 3:
         raise ValueError(f"{skill_md}: malformed frontmatter.")
     fm_text = parts[1]
-    meta: dict = {}
-    lines = fm_text.splitlines()
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-        if not line.strip():
-            i += 1
-            continue
-        if ":" not in line:
-            i += 1
-            continue
-        key, val = line.split(":", 1)
-        key = key.strip()
-        val = val.strip()
-        if val == "":
-            # collect following list items (e.g., tags)
-            vals: list[str] = []
-            j = i + 1
-            while j < len(lines) and lines[j].strip().startswith("-"):
-                vals.append(lines[j].strip().lstrip("-").strip())
-                j += 1
-            meta[key] = vals
-            i = j
-            continue
-        meta[key] = val.strip('"').strip("'")
-        i += 1
-    return meta
+    data = yaml.safe_load(fm_text)
+    if not isinstance(data, dict):
+        raise ValueError(f"{skill_md}: frontmatter did not parse to a mapping")
+    return data
 
 
 def validate(skill_md: Path) -> bool:

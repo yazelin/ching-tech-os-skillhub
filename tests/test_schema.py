@@ -8,39 +8,17 @@ SCHEMA = json.loads((REPO_ROOT / "schemas" / "skill.schema.json").read_text(enco
 
 
 def extract_frontmatter(skill_md: Path) -> dict:
+    import yaml
     text = skill_md.read_text(encoding="utf-8")
     if not text.startswith("---"):
         raise ValueError("missing frontmatter")
     parts = text.split("---", 2)
     if len(parts) < 3:
         raise ValueError("malformed frontmatter")
-    fm_text = parts[1]
-    meta = {}
-    lines = fm_text.splitlines()
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-        if not line.strip():
-            i += 1
-            continue
-        if ":" not in line:
-            i += 1
-            continue
-        key, val = line.split(":", 1)
-        key = key.strip()
-        val = val.strip()
-        if val == "":
-            vals = []
-            j = i + 1
-            while j < len(lines) and lines[j].strip().startswith("-"):
-                vals.append(lines[j].strip().lstrip("-").strip())
-                j += 1
-            meta[key] = vals
-            i = j
-            continue
-        meta[key] = val.strip('"').strip("'")
-        i += 1
-    return meta
+    data = yaml.safe_load(parts[1])
+    if not isinstance(data, dict):
+        raise ValueError("frontmatter did not parse to a mapping")
+    return data
 
 
 def test_all_skills_valid():

@@ -14,12 +14,13 @@ import zipfile
 import tempfile
 import shutil
 import os
+import yaml
 
 from client.models import Skill
 
 
 def _parse_frontmatter(skill_md: Path) -> Optional[dict]:
-    """Extract simple YAML frontmatter from a SKILL.md file without external deps.
+    """Extract YAML frontmatter from a SKILL.md file using PyYAML for robustness.
 
     Returns the parsed dict or None if frontmatter is missing.
     """
@@ -30,32 +31,33 @@ def _parse_frontmatter(skill_md: Path) -> Optional[dict]:
     if len(parts) < 3:
         return None
     fm_text = parts[1]
-    meta: dict = {}
-    lines = fm_text.splitlines()
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-        if not line.strip():
-            i += 1
-            continue
-        if ":" not in line:
-            i += 1
-            continue
-        key, val = line.split(":", 1)
-        key = key.strip()
-        val = val.strip()
-        if val == "":
-            vals: list[str] = []
-            j = i + 1
-            while j < len(lines) and lines[j].strip().startswith("-"):
-                vals.append(lines[j].strip().lstrip("-").strip())
-                j += 1
-            meta[key] = vals
-            i = j
-            continue
-        meta[key] = val.strip('"').strip("'")
-        i += 1
-    return meta
+    try:
+        data = yaml.safe_load(fm_text)
+        if isinstance(data, dict):
+            return data
+        return None
+    except Exception:
+        return None
+
+
+def safe_extract(zip_path: str | Path, dest_dir: str | Path) -> list[str]:
+    """Safely extract zip archive to dest_dir, skipping absolute or traversal paths.
+
+    Returns list of extracted relative paths.
+    """
+    dest_dir = Path(dest_dir)
+    extracted: list[str] = []
+    with zipfile.ZipFile(zip_path) as zf:
+        for member in zf.infolist():
+            member_path = Path(member.filename)
+            if member_path.is_absolute() or ".." in member_path.parts:
+                continue
+            out_path = dest_dir / member.filename
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(member) as src, open(out_path, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted.append(str(member.filename))
+    return extracted
 
 
 class SkillHubClient:
@@ -193,8 +195,19 @@ def main() -> None:
             sys.exit(1)
         tmpdir = tempfile.mkdtemp()
         with zipfile.ZipFile(tmpf.name) as zf:
-            zf.extractall(tmpdir)
-        entries = [p for p in os.listdir(tmpdir) if p]
+            # safe extraction: skip absolute paths and any paths containing '..'
+            safe_entries = []
+            for member in zf.infolist():
+                member_path = Path(member.filename)
+                if member_path.is_absolute() or ".." in member_path.parts:
+                    # skip potentially dangerous entries
+                    continue
+                dest_path = Path(tmpdir) / member.filename
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                with zf.open(member) as src, open(dest_path, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
+                safe_entries.append(member.filename.split("/")[0])
+            entries = sorted(set([e for e in safe_entries if e]))
         target_dir = client.skills_dir / args.slug
         if target_dir.exists():
             shutil.rmtree(target_dir)
