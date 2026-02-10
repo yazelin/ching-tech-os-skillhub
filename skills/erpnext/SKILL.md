@@ -4,6 +4,7 @@ version: "0.1.0"
 description: "MCP server for ERPNext REST API with CRUD, workflow, reports, schema inspection, inventory, trading, and file operations."
 author: yazelin
 entrypoint: run.sh
+license: MIT
 tags:
   - erpnext
   - mcp
@@ -11,9 +12,12 @@ tags:
 files:
   - run.sh
   - SKILL.md
-license: MIT
 dependencies: []
-ctos: {}
+metadata:
+  openclaw:
+    requires:
+      bins: ["uv"]
+      env: ["ERPNEXT_URL", "ERPNEXT_API_KEY", "ERPNEXT_API_SECRET"]
 ---
 
 # ERPNext MCP Server
@@ -32,17 +36,21 @@ MCP (Model Context Protocol) server for ERPNext REST API, built with FastMCP and
 - Files — upload, list, download files
 - Helpers — link search (autocomplete), document count, generic method calls
 
-## Requirements
+## Prerequisites
 
 - Python >= 3.11
-- uv (recommended) or pip
+- `uv` (recommended) or pip
 - ERPNext instance with API key/secret
+- Environment variables:
+  - `ERPNEXT_URL`
+  - `ERPNEXT_API_KEY`
+  - `ERPNEXT_API_SECRET`
 
 ## Setup
 
 ```bash
-# Clone the repo
-git clone https://github.com/yazelin/erpnext-mcp && cd erpnext-mcp
+# From the skill directory
+cd {baseDir}
 
 # Create .env file
 cat > .env << 'ENV'
@@ -59,6 +67,12 @@ uv sync
 
 ```bash
 set -a && source .env && set +a && uv run erpnext-mcp
+```
+
+If you only need the info banner, run the entrypoint script:
+
+```bash
+./run.sh
 ```
 
 ## MCP Client Configuration

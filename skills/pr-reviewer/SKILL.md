@@ -1,14 +1,19 @@
 ---
 name: pr-reviewer
-version: 1.0.0
+version: "1.0.0"
+description: "Automated GitHub PR code review with diff analysis, lint integration, and structured reports. Use when reviewing pull requests, checking for security issues, error handling gaps, test coverage, or code style problems. Supports Go, Python, and JavaScript/TypeScript. Requires `gh` CLI authenticated with repo access."
 author: yazelin
 entrypoint: scripts/pr-review.sh
+license: MIT
 tags:
   - github
   - code-review
   - pr
-description: Automated GitHub PR code review with diff analysis, lint integration, and structured reports. Use when reviewing pull requests, checking for security issues, error handling gaps, test coverage, or code style problems. Supports Go, Python, and JavaScript/TypeScript. Requires `gh` CLI authenticated with repo access.
-ctos: {}
+metadata:
+  openclaw:
+    requires:
+      bins: ["gh"]
+      optional_bins: ["golangci-lint", "ruff"]
 ---
 
 # PR Reviewer
@@ -19,9 +24,9 @@ Automated code review for GitHub pull requests. Analyzes diffs for security issu
 
 - `gh` CLI installed and authenticated (`gh auth status`)
 - Repository access (read at minimum, write for posting comments)
-- Optional: `golangci-lint` for Go linting, `ruff` for Python linting
+- Optional: `golangci-lint` (Go) and `ruff` (Python) for local lint checks
 
-## Quick Start
+## Usage
 
 ```bash
 # Review all open PRs in current repo
@@ -42,7 +47,7 @@ scripts/pr-review.sh list-unreviewed
 
 ## Configuration
 
-Set these environment variables or the script auto-detects from the current git repo:
+Set these environment variables or allow the script to auto-detect from the current git repo:
 
 - `PR_REVIEW_REPO` — GitHub repo in `owner/repo` format (default: detected from `gh repo view`)
 - `PR_REVIEW_DIR` — Local checkout path for lint (default: git root of cwd)
@@ -93,5 +98,5 @@ The analysis patterns in the script are organized by language. Add new patterns 
 
 ```python
 # Add a new Go pattern
-go_patterns.append((r'^\+.*os\.Exit\(', 'RISK', 'Direct os.Exit() — consider returning error'))
+go_patterns.append((r'^\\+.*os\\.Exit\\(', 'RISK', 'Direct os.Exit() — consider returning error'))
 ```

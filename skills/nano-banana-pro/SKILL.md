@@ -1,11 +1,11 @@
 ---
-name: nanobanana-pro-fallback
-description: "Nano Banana Pro with auto model fallback — generate/edit images via Gemini Image API. Run via: uv run {baseDir}/scripts/generate_image.py --prompt 'desc' --filename 'out.png' [--resolution 1K|2K|4K] [-i input.png]. Supports text-to-image + image-to-image (up to 14); 1K/2K/4K. Fallback chain: gemini-2.5-flash-image → gemini-2.0-flash-exp. MUST use uv run, not python3."
-version: 0.4.4
+name: nano-banana-pro
+version: "0.4.4"
+description: "Nano Banana Pro with auto model fallback — generate/edit images via Gemini Image API. Supports text-to-image and image-to-image (up to 14 images) at 1K/2K/4K resolutions. Fallback chain: gemini-2.5-flash-image → gemini-2.0-flash-exp-image-generation."
+author: yazelin
 entrypoint: scripts/generate_image.py
 license: MIT
 homepage: https://github.com/yazelin/nanobanana-pro
-author: yazelin
 tags:
   - ai-image
   - gemini
@@ -29,47 +29,51 @@ metadata:
         formula: uv
         bins: ["uv"]
         label: "Install uv (brew)"
-  ctos:
-    requires_app: ""
-    mcp_servers: ""
 ---
 
-# Nano Banana Pro with Fallback
+# Nano Banana Pro
 
 Use the bundled script to generate or edit images. Automatically falls back through multiple Gemini models if one fails.
 
+## Prerequisites
+
+- `uv` installed and available in `PATH`
+- `GEMINI_API_KEY` environment variable
+
+## Usage
+
 ⚠️ **IMPORTANT: MUST use `uv run` or the `generate` wrapper. Do NOT use `python3` directly — dependencies won't be available.**
 
-Generate (option A: wrapper script)
+Generate (wrapper script):
 
 ```bash
 {baseDir}/scripts/generate --prompt "your image description" --filename "output.png" --resolution 1K
 ```
 
-Generate (option B: uv run)
+Generate (uv run):
 
 ```bash
 uv run {baseDir}/scripts/generate_image.py --prompt "your image description" --filename "output.png" --resolution 1K
 ```
 
-Edit (single image)
+Edit (single image):
 
 ```bash
 uv run {baseDir}/scripts/generate_image.py --prompt "edit instructions" --filename "output.png" -i "/path/in.png" --resolution 2K
 ```
 
-Multi-image composition (up to 14 images)
+Multi-image composition (up to 14 images):
 
 ```bash
 uv run {baseDir}/scripts/generate_image.py --prompt "combine these into one scene" --filename "output.png" -i img1.png -i img2.png -i img3.png
 ```
 
-API key
+## Configuration
 
 - `GEMINI_API_KEY` env var
-- Or set `skills."nanobanana-pro-fallback".apiKey` / `skills."nanobanana-pro-fallback".env.GEMINI_API_KEY` in `~/.openclaw/openclaw.json`
+- Or set `skills.\"nano-banana-pro\".apiKey` / `skills.\"nano-banana-pro\".env.GEMINI_API_KEY` in `~/.openclaw/openclaw.json`
 
-Notes
+## Notes
 
 - Resolutions: `1K` (default), `2K`, `4K`.
 - Models tried in order: `gemini-2.5-flash-image` → `gemini-2.0-flash-exp-image-generation` (configurable via `NANOBANANA_FALLBACK_MODELS` env var).
