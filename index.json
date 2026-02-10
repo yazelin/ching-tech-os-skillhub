@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-02-10T07:19:23Z",
+  "updated_at": "2026-02-10T08:58:08Z",
   "skills": [
     {
       "slug": "pr-reviewer",
@@ -32,6 +32,22 @@
       ],
       "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.1/nano-banana-pro-0.4.4.zip",
       "sha256": "d6e4a83849a505b8a6f9b6ee52fd8ac6bccbfb29f319467de710653960e9a542",
+      "source": "skillhub",
+      "ctos": {}
+    },
+    {
+      "slug": "erpnext",
+      "name": "ERPNext MCP Server",
+      "version": "0.1.0",
+      "description": "MCP server for ERPNext REST API with CRUD, workflow, reports, schema inspection, inventory, trading, and file operations.",
+      "author": "yazelin",
+      "tags": [
+        "erpnext",
+        "mcp",
+        "api"
+      ],
+      "download_url": "",
+      "sha256": "",
       "source": "skillhub",
       "ctos": {}
     }
