@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "updated_at": "2026-02-10T05:57:08Z",
+  "skills": [
+    {
+      "slug": "pr-reviewer",
+      "name": "PR Reviewer",
+      "version": "1.0.0",
+      "description": "Automated GitHub PR code review with diff analysis, lint integration, and structured reports. Use when reviewing pull requests, checking for security issues, error handling gaps, test coverage, or code style problems. Supports Go, Python, and JavaScript/TypeScript. Requires `gh` CLI authenticated with repo access.",
+      "author": "yazelin",
+      "tags": ["github", "code-review", "pr"],
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/pr-reviewer-1.0.0.zip",
+      "sha256": "335414a38e059d8dc9b6ec02f129ae7c4859f3e114ff7c731b4577e7412fc501",
+      "source": "skillhub",
+      "ctos": {}
+    }
+  ]
+}

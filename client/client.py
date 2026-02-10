@@ -8,13 +8,18 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-import yaml
+import urllib.request
+import hashlib
+import zipfile
+import tempfile
+import shutil
+import os
 
 from client.models import Skill
 
 
 def _parse_frontmatter(skill_md: Path) -> Optional[dict]:
-    """Extract YAML frontmatter from a SKILL.md file.
+    """Extract simple YAML frontmatter from a SKILL.md file without external deps.
 
     Returns the parsed dict or None if frontmatter is missing.
     """
@@ -24,7 +29,33 @@ def _parse_frontmatter(skill_md: Path) -> Optional[dict]:
     parts = text.split("---", 2)
     if len(parts) < 3:
         return None
-    return yaml.safe_load(parts[1])
+    fm_text = parts[1]
+    meta: dict = {}
+    lines = fm_text.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i].rstrip()
+        if not line.strip():
+            i += 1
+            continue
+        if ":" not in line:
+            i += 1
+            continue
+        key, val = line.split(":", 1)
+        key = key.strip()
+        val = val.strip()
+        if val == "":
+            vals: list[str] = []
+            j = i + 1
+            while j < len(lines) and lines[j].strip().startswith("-"):
+                vals.append(lines[j].strip().lstrip("-").strip())
+                j += 1
+            meta[key] = vals
+            i = j
+            continue
+        meta[key] = val.strip('"').strip("'")
+        i += 1
+    return meta
 
 
 class SkillHubClient:
@@ -80,6 +111,11 @@ def main() -> None:
     info_p = sub.add_parser("info", help="Show metadata for a single skill.")
     info_p.add_argument("name", help="Skill name.")
 
+    # remote index and install
+    sub.add_parser("list-remote", help="List remote skills from index.json")
+    install_p = sub.add_parser("install", help="Install skill by slug from remote index")
+    install_p.add_argument("slug", help="Skill slug to install")
+
     args = parser.parse_args()
     client = SkillHubClient()
 
@@ -90,6 +126,63 @@ def main() -> None:
             return
         for s in skills:
             print(f"  {s.name}  v{s.version}  — {s.description}")
+
+    elif args.command == "list-remote":
+        index_url = "https://raw.githubusercontent.com/yazelin/ching-tech-os-skillhub/main/index.json"
+        try:
+            with urllib.request.urlopen(index_url) as r:
+                idx = json.loads(r.read().decode())
+        except Exception as e:
+            print("Failed to fetch index:", e)
+            sys.exit(1)
+        skills = idx.get("skills", [])
+        if not skills:
+            print("No remote skills found.")
+            return
+        for s in skills:
+            print(f"  {s['slug']}  {s.get('name','')}  v{s.get('version','')}  — {s.get('description','')}")
+
+    elif args.command == "install":
+        index_url = "https://raw.githubusercontent.com/yazelin/ching-tech-os-skillhub/main/index.json"
+        try:
+            with urllib.request.urlopen(index_url) as r:
+                idx = json.loads(r.read().decode())
+        except Exception as e:
+            print("Failed to fetch index:", e)
+            sys.exit(1)
+        skill = next((s for s in idx.get("skills", []) if s["slug"] == args.slug), None)
+        if not skill:
+            print(f"Skill '{args.slug}' not found in index.")
+            sys.exit(1)
+        url = skill["download_url"]
+        expected = skill.get("sha256")
+        tmpf = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            urllib.request.urlretrieve(url, tmpf.name)
+        except Exception as e:
+            print("Download failed:", e)
+            sys.exit(1)
+        h = hashlib.sha256()
+        with open(tmpf.name, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+        if expected and h.hexdigest() != expected:
+            print("SHA256 mismatch: expected", expected, "got", h.hexdigest())
+            sys.exit(1)
+        tmpdir = tempfile.mkdtemp()
+        with zipfile.ZipFile(tmpf.name) as zf:
+            zf.extractall(tmpdir)
+        entries = [p for p in os.listdir(tmpdir) if p]
+        target_dir = client.skills_dir / args.slug
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+        if len(entries) == 1 and entries[0] == args.slug:
+            shutil.move(os.path.join(tmpdir, entries[0]), str(target_dir))
+        else:
+            os.makedirs(target_dir, exist_ok=True)
+            for item in entries:
+                shutil.move(os.path.join(tmpdir, item), str(target_dir))
+        print(f"Installed {args.slug} -> {target_dir}")
 
     elif args.command == "validate":
         report = client.validate_install()
