@@ -25,7 +25,6 @@ dependencies:
 ctos:
   version: "0.1.0"
   namespace: erpnext-mcp
-  ert_integration: {}
   compatible_with:
     - "0.1.0"
   upgrade_policy: notify
