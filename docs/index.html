@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTOS SkillHub</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f7fa;--card:#fff;--text:#1a1a2e;--text2:#555;--border:#e2e8f0;--accent:#4f46e5;--accent2:#6366f1;--tag-bg:#eef2ff;--tag-text:#4338ca;--search-bg:#fff;--shadow:0 1px 3px rgba(0,0,0,.08)}
+[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--border:#334155;--accent:#818cf8;--accent2:#a5b4fc;--tag-bg:#312e81;--tag-text:#c7d2fe;--search-bg:#1e293b;--shadow:0 1px 3px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:2.5rem 1rem 2rem;text-align:center;position:relative}
+header h1{font-size:2rem;font-weight:800;letter-spacing:-.02em}
+header p{margin-top:.5rem;opacity:.85;font-size:.95rem}
+.theme-btn{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.2);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.theme-btn:hover{background:rgba(255,255,255,.35)}
+.container{max-width:960px;margin:0 auto;padding:1.5rem 1rem}
+.search-box{position:relative;margin-bottom:1.5rem}
+.search-box input{width:100%;padding:.85rem 1rem .85rem 2.8rem;border:1px solid var(--border);border-radius:12px;font-size:1rem;background:var(--search-bg);color:var(--text);outline:none;transition:border .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box svg{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text2)}
+.stats{font-size:.85rem;color:var(--text2);margin-bottom:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.card h2{font-size:1.15rem;font-weight:700;margin-bottom:.4rem}
+.card .meta{font-size:.8rem;color:var(--text2);margin-bottom:.6rem;display:flex;gap:.8rem;flex-wrap:wrap}
+.card .desc{font-size:.9rem;color:var(--text2);line-height:1.55;margin-bottom:.8rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.tag{background:var(--tag-bg);color:var(--tag-text);padding:.2rem .6rem;border-radius:6px;font-size:.75rem;font-weight:500}
+.card .dl{display:inline-flex;align-items:center;gap:.3rem;margin-top:.8rem;padding:.45rem .9rem;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;transition:background .2s}
+.card .dl:hover{background:var(--accent2)}
+.empty{text-align:center;padding:3rem 1rem;color:var(--text2)}
+.loading{text-align:center;padding:4rem 1rem;color:var(--text2)}
+@media(max-width:480px){header h1{font-size:1.5rem}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>🧩 CTOS SkillHub</h1>
+<p>Ching-Tech OS 技能市集 — 探索、安裝、擴充你的 AI 能力</p>
+<button class="theme-btn" onclick="toggleTheme()" title="切換主題">🌙</button>
+</header>
+<div class="container">
+<div class="search-box">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+<input type="text" id="search" placeholder="搜尋技能名稱、描述或標籤…" oninput="filter()">
+</div>
+<div class="stats" id="stats"></div>
+<div class="grid" id="grid"><div class="loading">載入中…</div></div>
+</div>
+<script>
+let skills=[];
+const grid=document.getElementById('grid'),stats=document.getElementById('stats'),search=document.getElementById('search');
+
+// Theme
+function toggleTheme(){const d=document.documentElement;const t=d.getAttribute('data-theme')==='dark'?'':'dark';d.setAttribute('data-theme',t);localStorage.setItem('theme',t);document.querySelector('.theme-btn').textContent=t?'☀️':'🌙'}
+(()=>{const t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'');if(t)document.documentElement.setAttribute('data-theme',t);document.querySelector('.theme-btn').textContent=t==='dark'?'☀️':'🌙'})();
+
+function render(list){
+  if(!list.length){grid.innerHTML='<div class="empty">找不到符合的技能 🔍</div>';stats.textContent='';return}
+  stats.textContent=`共 ${list.length} 個技能`;
+  grid.innerHTML=list.map(s=>`<div class="card">
+<h2>${esc(s.name)}</h2>
+<div class="meta"><span>v${esc(s.version)}</span><span>👤 ${esc(s.author)}</span></div>
+<div class="desc">${esc(s.description)}</div>
+<div class="tags">${(s.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+${s.download_url?`<a class="dl" href="${esc(s.download_url)}" target="_blank">⬇ 下載</a>`:''}
+</div>`).join('')}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function filter(){const q=search.value.toLowerCase();render(skills.filter(s=>[s.name,s.description,s.author,...(s.tags||[])].some(f=>(f||'').toLowerCase().includes(q))))}
+
+fetch('https://raw.githubusercontent.com/yazelin/ching-tech-os-skillhub/main/index.json')
+.then(r=>r.json()).then(d=>{skills=d.skills||[];render(skills)})
+.catch(()=>{grid.innerHTML='<div class="empty">無法載入技能列表，請稍後再試。</div>'});
+</script>
+</body>
+</html>
