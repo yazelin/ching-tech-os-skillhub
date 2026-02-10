@@ -1,11 +1,7 @@
-import io
 import json
-import os
-import sys
 from pathlib import Path
 import urllib.request
 
-import pytest
 
 from client.client import SkillHubClient
 

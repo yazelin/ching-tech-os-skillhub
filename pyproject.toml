@@ -22,3 +22,8 @@ packages = ["client"]
 
 [project.scripts]
 skillhub = "client.client:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+

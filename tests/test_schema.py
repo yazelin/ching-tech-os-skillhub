@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = json.loads((REPO_ROOT / "schemas" / "skill.schema.json").read_text(encoding="utf-8"))
