@@ -1,69 +1,35 @@
-# Skill Format Specification
+# Skill 格式說明
 
 ## SKILL.md
 
-Every skill **must** contain a `SKILL.md` file at its root.  
-This file combines human-readable documentation with machine-readable YAML frontmatter.
+每個 skill 都必須在根目錄提供 `SKILL.md`。它結合 YAML frontmatter（機器可讀）與文字說明（人類可讀），用來描述技能的用途、使用方式與執行需求。
 
-### Frontmatter Fields
+### Frontmatter 欄位
 
-| Field          | Type       | Required | Description                                    |
-|----------------|------------|----------|------------------------------------------------|
-| `name`         | string     | ✅       | Unique identifier (lowercase, hyphens only).   |
-| `version`      | string     | ✅       | Semantic version (`MAJOR.MINOR.PATCH`).        |
-| `description`  | string     | ✅       | Short one-line description.                    |
-| `author`       | string     | ✅       | Author name or GitHub handle.                  |
-| `tags`         | string[]   | ❌       | Searchable tags for categorization.            |
-| `entrypoint`   | string     | ✅       | Relative path to main script (e.g. `run.py`). |
-| `files`        | string[]   | ❌       | Explicit file list for packaging.              |
-| `license`      | string     | ❌       | SPDX identifier. Defaults to `MIT`.            |
-| `checksum`     | string     | ❌       | SHA-256 of the packaged artifact.              |
-| `dependencies` | object[]   | ❌       | List of `{name, version}` skill dependencies.  |
-| `ctos`         | object     | ❌       | CTOS platform namespace (see below).           |
+| 欄位 | 型別 | 必填 | 說明 |
+|---|---|---|---|
+| `name` | string | ✅ | 技能識別字，僅小寫與連字號。 |
+| `version` | string | ✅ | 語意化版本（MAJOR.MINOR.PATCH）。 |
+| `description` | string | ✅ | 一行簡介。 |
+| `author` | string | ✅ | 作者名稱或 GitHub 帳號。 |
+| `entrypoint` | string | ✅ | 主要入口（相對路徑）。 |
+| `license` | string | ✅ | 授權（建議 SPDX，如 `MIT`）。 |
+| `tags` | string[] | ❌ | 搜尋用標籤。 |
+| `files` | string[] | ❌ | 打包時的明確檔案清單。 |
+| `dependencies` | object[] | ❌ | 其他 skill 依賴（`{name, version}`）。 |
+| `checksum` | string | ❌ | 打包檔的 SHA-256。 |
+| `compatibility` | object | ❌ | 相容平台描述。 |
+| `metadata.openclaw` | object | ❌ | OpenClaw/CTOS 執行需求（見下方）。 |
+| `ctos` | object | ❌ | CTOS 平台額外設定（系統端管理為佳）。 |
 
-### CTOS Namespace
+### metadata.openclaw
 
-The `ctos` object provides platform-specific metadata:
+用於描述執行環境需求，常見欄位如下：
 
-| Field              | Type     | Required | Description                         |
-|--------------------|----------|----------|-------------------------------------|
-| `ctos.version`     | string   | ✅*      | Target CTOS version.                |
-| `ctos.compatible_with` | string[] | ❌   | Tested CTOS versions.               |
-| `ctos.upgrade_policy`  | string   | ❌   | `auto`, `manual`, or `notify`.      |
+- `requires.bins`：必須存在的 binaries（如 `uv`、`gh`）。
+- `requires.env`：必須設定的環境變數（如 `GEMINI_API_KEY`）。
+- `requires.optional_bins`：非必要但可提升功能的 binaries。
+- `primaryEnv`：主要金鑰（用於 UI 引導）。
+- `install`：建議安裝方式清單（可選）。
 
-*Required when `ctos` object is present.
-
-### Name Conventions
-
-- Lowercase alphanumeric with hyphens: `my-cool-skill`
-- No underscores, no uppercase, no spaces.
-- Maximum 64 characters.
-
-### Example
-
-```yaml
----
-name: weather-checker
-version: "1.2.0"
-description: "Fetches current weather for a configured location."
-author: yaze
-tags: [weather, utility]
-entrypoint: main.py
-files: [main.py, SKILL.md, config.yaml]
-license: MIT
-ctos:
-  version: "0.1.0"
-  compatible_with: ["0.1.0"]
-  upgrade_policy: auto
----
-```
-
-## Validation
-
-Use the provided script:
-
-```bash
-python scripts/validate_skill.py skills/weather-checker/SKILL.md
-```
-
-Or programmatically with `jsonschema` against `schemas/skill.schema.json`.
+如需在 CTOS 系統端集中管理環境變數與 MCP 參數，請參考 `templates/skill-config.yaml.example`。
