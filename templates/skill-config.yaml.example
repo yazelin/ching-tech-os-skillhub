@@ -1,0 +1,30 @@
+# CTOS Skill Configuration (System-side)
+# 此檔案管理 CTOS 特有的 skill 設定，不應放在 SKILL.md 中。
+# 部署位置：/etc/ctos/skills-config.yaml 或資料庫
+
+skills:
+  pr-reviewer:
+    enabled: true
+    requires_app: null
+    mcp_servers: []
+    allowed_tools: []
+
+  nano-banana-pro:
+    enabled: true
+    requires_app: ai-assistant
+    mcp_servers:
+      - nanobanana
+    allowed_tools:
+      - mcp__nanobanana__generate_image
+      - mcp__nanobanana__edit_image
+      - mcp__nanobanana__restore_image
+
+  erpnext:
+    enabled: true
+    requires_app: inventory
+    mcp_servers:
+      - erpnext
+    allowed_tools:
+      - mcp__erpnext__list_documents
+      - mcp__erpnext__get_document
+      - mcp__erpnext__create_document
