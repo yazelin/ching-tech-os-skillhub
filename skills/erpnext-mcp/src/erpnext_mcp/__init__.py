@@ -1,1 +1,0 @@
-# ERPNext MCP package
