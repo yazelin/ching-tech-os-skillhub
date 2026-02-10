@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillhub.ching-tech.os/schemas/skill.schema.json",
+  "title": "SkillHub Skill Metadata",
+  "description": "JSON Schema for CTOS skill metadata as defined in SKILL.md frontmatter.",
+  "type": "object",
+  "required": ["name", "version", "description", "author", "entrypoint"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Unique skill identifier (lowercase, hyphens allowed)."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version string (e.g. 1.0.0)."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short human-readable description of the skill."
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Author name or GitHub handle."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Searchable tags for categorization."
+    },
+    "entrypoint": {
+      "type": "string",
+      "description": "Relative path to the main executable or script (e.g. run.py)."
+    },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "List of files included in the skill package."
+    },
+    "license": {
+      "type": "string",
+      "default": "MIT",
+      "description": "SPDX license identifier."
+    },
+    "checksum": {
+      "type": "string",
+      "description": "SHA-256 checksum of the packaged skill artifact."
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "version"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" }
+        }
+      },
+      "default": [],
+      "description": "Optional list of skill dependencies."
+    },
+    "ctos": {
+      "type": "object",
+      "description": "CTOS-specific namespace fields.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "CTOS platform version this skill targets."
+        },
+        "compatible_with": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "List of CTOS versions this skill is tested against."
+        },
+        "upgrade_policy": {
+          "type": "string",
+          "enum": ["auto", "manual", "notify"],
+          "default": "notify",
+          "description": "How the skill should be upgraded: auto, manual, or notify."
+        }
+      },
+      "required": ["version"]
+    }
+  },
+  "additionalProperties": false
+}

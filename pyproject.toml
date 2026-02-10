@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "ching-tech-os-skillhub"
+version = "0.1.0"
+description = "SkillHub — skill registry and client for Ching Tech OS (CTOS)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "pydantic>=2.0",
+    "uvicorn>=0.24.0",
+    "jsonschema>=4.20.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+skillhub = "client.client:main"
