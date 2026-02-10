@@ -13,8 +13,8 @@
         "code-review",
         "pr"
       ],
-      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/pr-reviewer-1.0.0.zip",
-      "sha256": "335414a38e059d8dc9b6ec02f129ae7c4859f3e114ff7c731b4577e7412fc501",
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.3.0/pr-reviewer.zip",
+      "sha256": "750a040062128f6f1b3b107f2c009de124ced429e57f2984258c07cbe5f0a420",
       "source": "skillhub"
     },
     {
@@ -29,8 +29,8 @@
         "image-generation",
         "image-editing"
       ],
-      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.1/nano-banana-pro-0.4.4.zip",
-      "sha256": "d6e4a83849a505b8a6f9b6ee52fd8ac6bccbfb29f319467de710653960e9a542",
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.3.0/nano-banana-pro.zip",
+      "sha256": "6da9598f5ea7b17ad496513cdc44827f13b508c6a7c2b8490fed7c8773b66c5f",
       "source": "skillhub"
     },
     {
@@ -44,8 +44,8 @@
         "mcp",
         "api"
       ],
-      "download_url": "",
-      "sha256": "",
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.3.0/erpnext.zip",
+      "sha256": "51b4f694353f436890e6c10af604d95662d62544dcc5a814b34e8d543f8ab737",
       "source": "skillhub"
     }
   ]
