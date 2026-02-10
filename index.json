@@ -8,9 +8,60 @@
       "version": "1.0.0",
       "description": "Automated GitHub PR code review with diff analysis, lint integration, and structured reports. Use when reviewing pull requests, checking for security issues, error handling gaps, test coverage, or code style problems. Supports Go, Python, and JavaScript/TypeScript. Requires `gh` CLI authenticated with repo access.",
       "author": "yazelin",
-      "tags": ["github", "code-review", "pr"],
+      "tags": [
+        "github",
+        "code-review",
+        "pr"
+      ],
       "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/pr-reviewer-1.0.0.zip",
       "sha256": "335414a38e059d8dc9b6ec02f129ae7c4859f3e114ff7c731b4577e7412fc501",
+      "source": "skillhub",
+      "ctos": {}
+    },
+    {
+      "slug": "md2doc",
+      "name": "MD2DOC-Evolution",
+      "version": "1.3.0",
+      "description": "Markdown → Word 轉換工具 (Web app)",
+      "author": "yazelin",
+      "tags": [
+        "document",
+        "word",
+        "markdown",
+        "conversion"
+      ],
+      "download_url": "https://raw.githubusercontent.com/yazelin/ching-tech-os-skillhub/main/md2doc-evolution-1.3.0.zip",
+      "sha256": "27fcc145d52c5395427bfe14d2ecd51b628038c8d20d3274363e25ddd6079310",
+      "source": "github",
+      "ctos": {}
+    },
+    {
+      "slug": "md2ppt",
+      "name": "MD2PPT-Evolution",
+      "version": "1.0.0",
+      "description": "將 Markdown 轉換為 PowerPoint 的工具（Web），包含主題與圖表轉換。",
+      "author": "yazelin",
+      "tags": ["document", "ppt", "markdown", "conversion"],
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.1/md2ppt-1.0.0.zip",
+      "sha256": "78f41388da614657f8f9bd5c8a99d83b3f3dbb9f5209e72d634665e64cac5b9a",
+      "source": "skillhub",
+      "ctos": {}
+    }
+  ,
+    {
+      "slug": "nanobanana-mcp",
+      "name": "NanoBanana MCP",
+      "version": "0.1.0",
+      "description": "AI 圖片生成 MCP Server，支援文字轉圖、圖片編修、修復與自動 fallback（使用 Google Gemini）。",
+      "author": "yazelin",
+      "tags": [
+        "ai",
+        "image-generation",
+        "mcp",
+        "gemini"
+      ],
+      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/nanobanana-mcp.zip",
+      "sha256": "e6bcf77b4a33d96397bd221395a17295f3a6ad4377ef97d64aba01a26fe6c70b",
       "source": "skillhub",
       "ctos": {}
     }
