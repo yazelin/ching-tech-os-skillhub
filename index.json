@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-02-10T06:44:10Z",
+  "updated_at": "2026-02-10T07:19:23Z",
   "skills": [
     {
       "slug": "pr-reviewer",
@@ -19,40 +19,21 @@
       "ctos": {}
     },
     {
-      "slug": "nanobanana",
-      "name": "Nanobanana",
+      "slug": "nano-banana-pro",
+      "name": "Nano Banana Pro",
       "version": "1.0.0",
-      "description": "AI image generation helper skill for nanobanana-py (documentation and wrapper scripts).",
+      "description": "Generate or edit images via Gemini 3 Pro Image. Supports text-to-image, image editing, and multi-image composition.",
       "author": "yazelin",
       "tags": [
         "ai-image",
-        "nanobanana",
-        "gemini"
-      ],
-      "download_url": "https://github.com/yazelin/ching-tech-os-skillhub/releases/download/v0.1.0/nanobanana-1.0.0.zip",
-      "sha256": "",
-      "source": "skillhub",
-      "ctos": {}
-    },
-    {
-      "slug": "erpnext",
-      "name": "ERPNext",
-      "version": "1.0.0",
-      "description": "Skill for integrating with ERPNext via erpnext-mcp. Provides guidance and helper scripts for installation, connection testing, and common operations.",
-      "author": "yazelin",
-      "tags": [
-        "erpnext",
-        "mcp",
-        "integration"
+        "gemini",
+        "image-generation",
+        "image-editing"
       ],
       "download_url": "",
       "sha256": "",
       "source": "skillhub",
-      "ctos": {
-        "erp_integration": {
-          "enabled": true
-        }
-      }
+      "ctos": {}
     }
   ]
 }
